@@ -120,6 +120,7 @@ ggplot(city_models, aes(x = reorder(city_state, or), y = or)) +
 
 # Problem 2
 For this problem, we’ll use the Central Park weather data similar to data we’ve seen elsewhere. The code chunk below (adapted from the course website) will download these data.
+
 ```{r}
 weather_df = 
   rnoaa::meteo_pull_monitors(
@@ -133,14 +134,56 @@ weather_df =
     tmax = tmax / 10) |>
   select(name, id, everything())
 ```
-The boostrap is helpful when you’d like to perform inference for a parameter / value / summary that doesn’t have an easy-to-write-down distribution in the usual repeated sampling framework. We’ll focus on a simple linear regression with tmax as the response with tmin and prcp as the predictors, and are interested in the distribution of two quantities estimated from these data:
 
-r̂ 2
-log(β̂ 1∗β̂ 2)
-Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. Plot the distribution of your estimates, and describe these in words. Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for r̂ 2
- and log(β̂ 0∗β̂ 1)
-. Note: broom::glance() is helpful for extracting r̂ 2
- from a fitted regression, and broom::tidy() (with some additional wrangling) should help in computing log(β̂ 1∗β̂ 2)
-.
+The boostrap is helpful when you’d like to perform inference for a parameter/ value/ summary that doesn’t have an easy-to-write-down distribution in the usual repeated sampling framework. We’ll focus on a simple linear regression with `tmax` as the response with `tmin` and `prcp` as the predictors, and are interested in the distribution of two quantities estimated from these data:
 
+* \( \hat{r}^2 \) 
+* \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \)
 
+Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. 
+
+- Plot the distribution of your estimates, and describe these in words. 
+- Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for \( \hat{r}^2 \) and \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \). 
+
+Note: broom::glance() is helpful for extracting \( \hat{r}^2 \) from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \)). 
+
+```{r}
+# define a function to perform the linear regression and extract r^2 and beta_product = log(beta1 * beta2)
+analyze_sample <- function(sample_data) {
+  model <- lm(tmax ~ tmin + prcp, data = sample_data)
+  glance_data <- broom::glance(model)
+  tidy_data <- broom::tidy(model)
+  r_squared <- glance_data$r.squared
+  beta_product <- exp(log(tidy_data$estimate[2]) + log(tidy_data$estimate[3]))
+  return(c(r_squared, beta_product))
+}
+
+# Generate the bootstrap samples using rerun and analyze each sample
+set.seed(123) 
+bootstrap_samples <- rerun(5000, sample_n(weather_df, nrow(weather_df), replace = TRUE))
+bootstrap_results <- map(bootstrap_samples, analyze_sample)
+
+# Extract r^2 and log(beta1 * beta2) estimates
+r_squared <- map_dbl(bootstrap_results, 1)
+log_beta_product <- map_dbl(bootstrap_results, 2)
+
+```
+```{r}
+# Plot the distribution of r^2 estimates
+ggplot(data.frame(r_squared), aes(x = r_squared)) +
+  geom_histogram(bins = 30, fill = "blue", color = "black") +
+  labs(title = "Distribution of R-squared Estimates", x = "R-squared", y = "Frequency")
+
+# Plot the distribution of log(beta1 * beta2) estimates
+ggplot(data.frame(log_beta_product), aes(x = log_beta_product)) +
+  geom_histogram(bins = 30, fill = "red", color = "black") +
+  labs(title = "Distribution of log(beta1 * beta2) Estimates", x = "log(beta1 * beta2)", y = "Frequency")
+
+# Calculate the 95% confidence intervals
+r_squared_ci <- quantile(r_squared, probs = c(0.025, 0.975))
+log_beta_product_ci <- quantile(log_beta_product, probs = c(0.025, 0.975), na.rm = TRUE)
+
+```
+
+- 95% CI for \( \hat{r}^2 \) is [`r r_squared_ci[1]`, `r r_squared_ci[2]`]
+- 95% CI for \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \) is [`r log_beta_product_ci[1]`, `r log_beta_product_ci[2]`]. 

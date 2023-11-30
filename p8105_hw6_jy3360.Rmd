@@ -32,11 +32,11 @@ scale_fill_discrete = scale_fill_viridis_d
 
 The Washington Post has gathered data on homicides in 50 large U.S. cities and made the data available through a GitHub repository here. You can read their accompanying article here.
 
-* Create a `city_state` variable (e.g. “Baltimore, MD”), and a binary variable indicating whether the homicide is solved. 
-* Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. 
-* Also omit Tulsa, AL – this is a data entry mistake. 
-* For this problem, limit your analysis those for whom victim_race is white or black. 
-* Be sure that victim_age is numeric.
+-   Create a `city_state` variable (e.g. "Baltimore, MD"), and a binary variable indicating whether the homicide is solved.
+-   Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO -- these don't report victim race.
+-   Also omit Tulsa, AL -- this is a data entry mistake.
+-   For this problem, limit your analysis those for whom victim_race is white or black.
+-   Be sure that victim_age is numeric.
 
 ```{r}
 homicide_data <- read_csv("homicide-data.csv") %>%
@@ -48,14 +48,13 @@ homicide_data <- read_csv("homicide-data.csv") %>%
          victim_race %in% c("White", "Black"))
 ```
 
-
 ### Part b
 
-For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors. 
+For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors.
 
-* Save the output of glm as an R object; 
-* apply the broom::tidy to this object; 
-* and obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed.
+-   Save the output of glm as an R object;
+-   apply the broom::tidy to this object;
+-   and obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed.
 
 ```{r}
 # data for Baltimore, MD
@@ -81,9 +80,10 @@ male_female_or_ci <- exp(confint(baltimore_glm)["victim_sexMale",])
 The estimate of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed is `r male_female_or` and the confidence interval is (`r male_female_or_ci`).
 
 ### Part c
-Now run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing male victims to female victims. 
 
-Do this within a “tidy” pipeline, making use of purrr::map, list columns, and unnest as necessary to create a dataframe with estimated ORs and CIs for each city.
+Now run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing male victims to female victims.
+
+Do this within a "tidy" pipeline, making use of purrr::map, list columns, and unnest as necessary to create a dataframe with estimated ORs and CIs for each city.
 
 ```{r}
 # Assuming your data is in a dataframe called cleaned_data
@@ -115,6 +115,7 @@ city_models <- homicide_data %>%
 ```
 
 ### Part d
+
 Create a plot that shows the estimated ORs and CIs for each city. Organize cities according to estimated OR, and comment on the plot.
 
 ```{r, fig.width = 8, fig.height = 10}
@@ -131,14 +132,14 @@ ggplot(city_models, aes(x = reorder(city_state, or), y = or)) +
 
 **Comments**
 
-- The ORs for most cities are less than 1, suggesting that, after keeping all other variables fixed, homicides with female victims are more likely to be solved than those with male victims.
-- The cities at the top of the plot, such as Fresno, CA, and Minneapolis, MN, have ORs greater than 1, indicating a relatively higher likelihood of solving cases with male victims in these cities.
-- Some cities, like Tulsa, OK, and Nashville, TN, have confidence intervals that cross the OR of 1, suggesting that there is no statistically significant difference in the likelihood of solving homicides between male and female victims in those cities.
-- The confidence intervals for cities like Fresno, CA, do not cross 1, suggesting a statistically significant difference in the likelihood of solving homicides with male victims compared to female victims.
-
+-   The ORs for most cities are less than 1, suggesting that, after keeping all other variables fixed, homicides with female victims are more likely to be solved than those with male victims.
+-   The cities at the top of the plot, such as Fresno, CA, and Minneapolis, MN, have ORs greater than 1, indicating a relatively higher likelihood of solving cases with male victims in these cities.
+-   Some cities, like Tulsa, OK, and Nashville, TN, have confidence intervals that cross the OR of 1, suggesting that there is no statistically significant difference in the likelihood of solving homicides between male and female victims in those cities.
+-   The confidence intervals for cities like Fresno, CA, do not cross 1, suggesting a statistically significant difference in the likelihood of solving homicides with male victims compared to female victims.
 
 # Problem 2
-For this problem, we’ll use the Central Park weather data similar to data we’ve seen elsewhere. The code chunk below (adapted from the course website) will download these data.
+
+For this problem, we'll use the Central Park weather data similar to data we've seen elsewhere. The code chunk below (adapted from the course website) will download these data.
 
 ```{r}
 weather_df = 
@@ -154,83 +155,116 @@ weather_df =
   select(name, id, everything())
 ```
 
-The boostrap is helpful when you’d like to perform inference for a parameter/ value/ summary that doesn’t have an easy-to-write-down distribution in the usual repeated sampling framework. We’ll focus on a simple linear regression with `tmax` as the response with `tmin` and `prcp` as the predictors, and are interested in the distribution of two quantities estimated from these data:
+The boostrap is helpful when you'd like to perform inference for a parameter/ value/ summary that doesn't have an easy-to-write-down distribution in the usual repeated sampling framework. We'll focus on a simple linear regression with `tmax` as the response with `tmin` and `prcp` as the predictors, and are interested in the distribution of two quantities estimated from these data:
 
-* \( \hat{r}^2 \) 
-* \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \)
+-   $\hat{r}^2$
+-   $\log(\hat{\beta}_1 \times \hat{\beta}_2)$
 
-Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. 
+Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities.
 
-- Plot the distribution of your estimates, and describe these in words. 
-- Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for \( \hat{r}^2 \) and \( \log(\hat{\beta}_0 \times \hat{\beta}_1) \). 
+-   Plot the distribution of your estimates, and describe these in words.
+-   Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for $\hat{r}^2$ and $\log(\hat{\beta}_0 \times \hat{\beta}_1)$.
 
-Note: broom::glance() is helpful for extracting \( \hat{r}^2 \) from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \). 
+Note: broom::glance() is helpful for extracting $\hat{r}^2$ from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing $\log(\hat{\beta}_1 \times \hat{\beta}_2)$.
 
 ```{r}
-# define a function to perform the linear regression and extract r^2 and beta_product = log(beta1 * beta2)
-analyze_sample <- function(sample_data) {
-  model <- lm(tmax ~ tmin + prcp, data = sample_data)
-  glance_data <- broom::glance(model)
-  tidy_data <- broom::tidy(model)
-  r_squared <- glance_data$r.squared
-  beta_product <- exp(log(tidy_data$estimate[2]) + log(tidy_data$estimate[3]))
-  return(c(r_squared, beta_product))
-}
+# Define the number of bootstrap
+n = 5000
 
-# Generate the bootstrap samples using rerun and analyze each sample
-set.seed(123) 
-bootstrap_samples <- rerun(5000, sample_n(weather_df, nrow(weather_df), replace = TRUE))
-bootstrap_results <- map(bootstrap_samples, analyze_sample)
+# bootstraps function
+bootstraps = function(df) {
+  sample_frac(df, replace = TRUE)}
 
-# Extract r^2 and log(beta1 * beta2) estimates
-r_squared <- map_dbl(bootstrap_results, 1)
-log_beta_product <- map_dbl(bootstrap_results, 2)
+# generate bootstrap samples
+boot_samples = 
+  tibble(boot_number = 1:n) |> 
+  mutate(
+    strap_sample = map(boot_number, \(i) bootstraps(df = weather_df))
+    )
 
+# generate the estimates of interest
+bootstrap_results = 
+  boot_samples %>%
+  mutate(
+    models = map(strap_sample, \(df) lm(tmax ~ tmin+prcp, data = df) ),
+    results_tidy = map(models, broom::tidy),
+    results_glance = map(models, broom::glance)) %>%
+  select(-strap_sample, -models) %>%
+  unnest(results_tidy, results_glance) %>%
+  select(boot_number, term, estimate, r.squared)
+
+# generate the second quantity 
+
+# Alternative approach to pivot and mutate the dataset
+bootstrap_results_2 <- 
+  bootstrap_results %>%
+  spread(key = term, value = estimate) %>% 
+  mutate(log_product = if_else(tmin * prcp <= 0, NA, log(tmin * prcp))) 
+
+head(bootstrap_results_2)
 ```
+
 ```{r}
 # Plot the distribution of r^2 estimates
-ggplot(data.frame(r_squared), aes(x = r_squared)) +
-  geom_histogram(bins = 30, fill = "blue", color = "black") +
+bootstrap_results_2 %>%
+  ggplot(aes(x = r.squared)) +
+  geom_histogram(bins = 30, fill = "steelblue", color = "black") +
   labs(title = "Distribution of R-squared Estimates", x = "R-squared", y = "Frequency")
 
 # Plot the distribution of log(beta1 * beta2) estimates
-ggplot(data.frame(log_beta_product), aes(x = log_beta_product)) +
-  geom_histogram(bins = 30, fill = "red", color = "black") +
-  labs(title = "Distribution of log(beta1 * beta2) Estimates", x = "log(beta1 * beta2)", y = "Frequency")
-
-# Calculate the 95% confidence intervals
-r_squared_ci <- quantile(r_squared, probs = c(0.025, 0.975))
-log_beta_product_ci <- quantile(log_beta_product, probs = c(0.025, 0.975), na.rm = TRUE)
+bootstrap_results_2 %>%
+  ggplot(aes(x = log_product)) +
+  geom_histogram(bins = 30, fill = "darkgreen", color = "black") +
+  labs(title = "Distribution of log(beta1 * beta2) Estimates", 
+       x = "log(beta1 * beta2)", y = "Frequency")
 
 ```
 
-- 95% CI for \( \hat{r}^2 \) is (`r r_squared_ci[1]`, `r r_squared_ci[2]`)
-- 95% CI for \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \) is (`r log_beta_product_ci[1]`, `r log_beta_product_ci[2]`)
+```{r}
+# 95% confidence intervals
+ci_95 <- 
+  bootstrap_results_2 %>%
+  summarize(
+    lower_ci = c(quantile(r.squared, 0.025, na.rm = TRUE),
+                 quantile(log_product, 0.025, na.rm = TRUE)),
+    upper_ci = c(quantile(r.squared, 0.975, na.rm = TRUE),
+                 quantile(log_product, 0.975, na.rm = TRUE))) %>%
+  mutate(quantity_type = c("r_squared", "log_product")) %>%  
+  select(quantity_type, lower_ci, upper_ci) 
+
+ci_95 %>% 
+  knitr::kable(digits = 3)
+```
+
+
+-   The 95% CI for $\hat{r}^2$ is (`r round(ci_95[1, 2], digits = 3)`, `r round(ci_95[1, 3], digits = 3)`)
+-   The 95% CI for $\log(\hat{\beta}_1 \times \hat{\beta}_2)$ is (`r round(ci_95[2, 2], digits = 3)`, `r round(ci_95[2, 3], digits = 3)`)
 
 
 # Problem 3
-In this problem, you will analyze data gathered to understand the effects of several variables on a child’s birthweight. This dataset consists of roughly 4000 children and includes the following variables:
 
-- `babysex`: baby’s sex (male = 1, female = 2)
-- `bhead`: baby’s head circumference at birth (centimeters)
-- `blength`: baby’s length at birth (centimeteres)
-- `bwt`: baby’s birth weight (grams)
-- `delwt`: mother’s weight at delivery (pounds)
-- `fincome`: family monthly income (in hundreds, rounded)
-- `frace`: father’s race (1 = White, 2 = Black, 3 = Asian, 4 = Puerto Rican, 8 = Other, 9 = Unknown)
-- `gaweeks`: gestational age in weeks
-- `malform`: presence of malformations that could affect weight (0 = absent, 1 = present)
-- `menarche`: mother’s age at menarche (years)
-- `mheigth`: mother’s height (inches)
-- `momage`: mother’s age at delivery (years)
-- `mrace`: mother’s race (1 = White, 2 = Black, 3 = Asian, 4 = Puerto Rican, 8 = Other)
-- `parity`: number of live births prior to this pregnancy
-- `pnumlbw`: previous number of low birth weight babies
-- `pnumgsa`: number of prior small for gestational age babies
-- `ppbmi`: mother’s pre-pregnancy BMI
-- `ppwt`: mother’s pre-pregnancy weight (pounds)
-- `smoken`: average number of cigarettes smoked per day during pregnancy
-- `wtgain`: mother’s weight gain during pregnancy (pounds)
+In this problem, you will analyze data gathered to understand the effects of several variables on a child's birthweight. This dataset consists of roughly 4000 children and includes the following variables:
+
+-   `babysex`: baby's sex (male = 1, female = 2)
+-   `bhead`: baby's head circumference at birth (centimeters)
+-   `blength`: baby's length at birth (centimeteres)
+-   `bwt`: baby's birth weight (grams)
+-   `delwt`: mother's weight at delivery (pounds)
+-   `fincome`: family monthly income (in hundreds, rounded)
+-   `frace`: father's race (1 = White, 2 = Black, 3 = Asian, 4 = Puerto Rican, 8 = Other, 9 = Unknown)
+-   `gaweeks`: gestational age in weeks
+-   `malform`: presence of malformations that could affect weight (0 = absent, 1 = present)
+-   `menarche`: mother's age at menarche (years)
+-   `mheigth`: mother's height (inches)
+-   `momage`: mother's age at delivery (years)
+-   `mrace`: mother's race (1 = White, 2 = Black, 3 = Asian, 4 = Puerto Rican, 8 = Other)
+-   `parity`: number of live births prior to this pregnancy
+-   `pnumlbw`: previous number of low birth weight babies
+-   `pnumgsa`: number of prior small for gestational age babies
+-   `ppbmi`: mother's pre-pregnancy BMI
+-   `ppwt`: mother's pre-pregnancy weight (pounds)
+-   `smoken`: average number of cigarettes smoked per day during pregnancy
+-   `wtgain`: mother's weight gain during pregnancy (pounds)
 
 Load and clean the data for regression analysis (i.e. convert numeric to factor where appropriate, check for missing data, etc.).
 
@@ -251,10 +285,10 @@ birth_data <- birth_data %>%
 skimr::skim(birth_data)
 ```
 
-Propose a regression model for birthweight. 
+Propose a regression model for birthweight.
 
-- This model may be based on a hypothesized structure for the factors that underly birthweight, on a data-driven model-building process, or a combination of the two. 
-- Describe your modeling process and show a plot of model residuals against fitted values – use `add_predictions` and `add_residuals` in making this plot.
+-   This model may be based on a hypothesized structure for the factors that underly birthweight, on a data-driven model-building process, or a combination of the two.
+-   Describe your modeling process and show a plot of model residuals against fitted values -- use `add_predictions` and `add_residuals` in making this plot.
 
 ```{r}
 # fit a linear model
@@ -276,13 +310,12 @@ ggplot(birth_data, aes(x = pred, y = resid)) +
 
 Compare your model to two others:
 
-- One using length at birth and gestational age as predictors (main effects only)
-- One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
+-   One using length at birth and gestational age as predictors (main effects only)
+-   One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
 
 Make this comparison in terms of the cross-validated prediction error; use `crossv_mc` and functions in `purrr` as appropriate.
 
-Note that although we expect your model to be reasonable, model building itself is not a main idea of the course and we don’t necessarily expect your model to be "optimal".
-
+Note that although we expect your model to be reasonable, model building itself is not a main idea of the course and we don't necessarily expect your model to be "optimal".
 
 ```{r}
 # model comparison 1
@@ -320,4 +353,3 @@ mean_rmse_results <- map_dbl(rmse_results, mean)
 # Print the results
 print(mean_rmse_results)
 ```
-

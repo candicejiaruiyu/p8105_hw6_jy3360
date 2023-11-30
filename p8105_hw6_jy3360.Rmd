@@ -164,7 +164,7 @@ Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of 
 - Plot the distribution of your estimates, and describe these in words. 
 - Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for \( \hat{r}^2 \) and \( \log(\hat{\beta}_0 \times \hat{\beta}_1) \). 
 
-Note: broom::glance() is helpful for extracting \( \hat{r}^2 \) from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \)). 
+Note: broom::glance() is helpful for extracting \( \hat{r}^2 \) from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \). 
 
 ```{r}
 # define a function to perform the linear regression and extract r^2 and beta_product = log(beta1 * beta2)

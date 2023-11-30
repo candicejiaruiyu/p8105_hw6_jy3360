@@ -27,7 +27,9 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 # Problem 1
+
 ### Part a
+
 The Washington Post has gathered data on homicides in 50 large U.S. cities and made the data available through a GitHub repository here. You can read their accompanying article here.
 
 * Create a `city_state` variable (e.g. “Baltimore, MD”), and a binary variable indicating whether the homicide is solved. 
@@ -46,7 +48,9 @@ homicide_data <- read_csv("homicide-data.csv") %>%
          victim_race %in% c("White", "Black"))
 ```
 
+
 ### Part b
+
 For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors. 
 
 * Save the output of glm as an R object; 
@@ -158,7 +162,7 @@ The boostrap is helpful when you’d like to perform inference for a parameter/ 
 Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates of these two quantities. 
 
 - Plot the distribution of your estimates, and describe these in words. 
-- Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for \( \hat{r}^2 \) and \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \). 
+- Using the 5000 bootstrap estimates, identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for \( \hat{r}^2 \) and \( \log(\hat{\beta}_0 \times \hat{\beta}_1) \). 
 
 Note: broom::glance() is helpful for extracting \( \hat{r}^2 \) from a fitted regression, and `broom::tidy()` (with some additional wrangling) should help in computing \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \)). 
 
@@ -202,7 +206,6 @@ log_beta_product_ci <- quantile(log_beta_product, probs = c(0.025, 0.975), na.rm
 
 - 95% CI for \( \hat{r}^2 \) is (`r r_squared_ci[1]`, `r r_squared_ci[2]`)
 - 95% CI for \( \log(\hat{\beta}_1 \times \hat{\beta}_2) \) is (`r log_beta_product_ci[1]`, `r log_beta_product_ci[2]`)
-
 
 
 # Problem 3
